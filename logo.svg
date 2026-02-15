@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a2a5e"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </radialGradient>
+    <linearGradient id="bolt" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f7dc6f"/>
+      <stop offset="100%" stop-color="#f39c12"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#0088cc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" rx="40" fill="url(#bg)"/>
+
+  <!-- Chip pins - top -->
+  <rect x="130" y="85" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="160" y="85" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="190" y="85" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="220" y="85" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="250" y="85" width="16" height="25" rx="3" fill="url(#chip)"/>
+
+  <!-- Chip pins - bottom -->
+  <rect x="130" y="290" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="160" y="290" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="190" y="290" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="220" y="290" width="16" height="25" rx="3" fill="url(#chip)"/>
+  <rect x="250" y="290" width="16" height="25" rx="3" fill="url(#chip)"/>
+
+  <!-- Chip pins - left -->
+  <rect x="75" y="135" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="75" y="165" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="75" y="195" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="75" y="225" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="75" y="255" width="25" height="16" rx="3" fill="url(#chip)"/>
+
+  <!-- Chip pins - right -->
+  <rect x="300" y="135" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="300" y="165" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="300" y="195" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="300" y="225" width="25" height="16" rx="3" fill="url(#chip)"/>
+  <rect x="300" y="255" width="25" height="16" rx="3" fill="url(#chip)"/>
+
+  <!-- Chip body -->
+  <rect x="100" y="108" width="200" height="184" rx="16" fill="none" stroke="url(#chip)" stroke-width="3"/>
+
+  <!-- Inner chip area -->
+  <rect x="118" y="126" width="164" height="148" rx="10" fill="#16213e" stroke="#0f3460" stroke-width="2"/>
+
+  <!-- Lightning bolt -->
+  <polygon points="192,140 168,198 196,198 174,258 232,188 204,188 226,140" fill="url(#bolt)" stroke="#e67e22" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Text: MCP -->
+  <text x="200" y="340" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="30" fill="#00d4ff" letter-spacing="4">MCP</text>
+
+  <!-- Text: colab-exec -->
+  <text x="200" y="368" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#e0e0e0" letter-spacing="1">colab-exec</text>
+</svg>
