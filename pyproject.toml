@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-server-colab-exec"
+version = "0.1.0"
+description = "MCP server for executing Python code on Google Colab GPU runtimes (T4/L4)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Paritosh Dwivedi" }]
+keywords = ["mcp", "colab", "gpu", "cuda", "machine-learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "mcp[cli]>=1.6.0",
+    "requests",
+    "websocket-client",
+    "google-auth",
+    "google-auth-oauthlib",
+]
+
+[project.scripts]
+mcp-server-colab-exec = "mcp_server_colab_exec.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server_colab_exec"]

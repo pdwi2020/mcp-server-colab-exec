@@ -1,0 +1,5 @@
+startCommand:
+  type: stdio
+  configSchema: {}
+  commandFunction: |-
+    (config) => ({ command: "mcp-server-colab-exec" })
