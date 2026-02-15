@@ -107,7 +107,7 @@ def _run_on_colab(code: str, accelerator: str, timeout: int) -> tuple[str, str, 
 
 # ── Tools ────────────────────────────────────────────────────────────────────
 
-@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False})
+@mcp.tool(annotations={"title": "Execute Python Code on GPU", "readOnlyHint": False, "destructiveHint": False})
 def colab_execute(code: str, accelerator: str = "T4", timeout: int = 300) -> str:
     """Execute Python code on a Google Colab GPU runtime.
 
@@ -127,7 +127,7 @@ def colab_execute(code: str, accelerator: str = "T4", timeout: int = 300) -> str
     return json.dumps(result, indent=2)
 
 
-@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False})
+@mcp.tool(annotations={"title": "Execute Python File on GPU", "readOnlyHint": False, "destructiveHint": False})
 def colab_execute_file(file_path: str, accelerator: str = "T4", timeout: int = 300) -> str:
     """Execute a local Python file on a Google Colab GPU runtime.
 
@@ -152,7 +152,7 @@ def colab_execute_file(file_path: str, accelerator: str = "T4", timeout: int = 3
     return json.dumps(result, indent=2)
 
 
-@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False})
+@mcp.tool(annotations={"title": "Execute Code and Download Artifacts", "readOnlyHint": False, "destructiveHint": False})
 def colab_execute_notebook(
     code: str, output_dir: str, accelerator: str = "T4", timeout: int = 300
 ) -> str:
