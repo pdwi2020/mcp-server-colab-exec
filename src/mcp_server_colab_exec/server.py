@@ -10,8 +10,11 @@ import base64
 import json
 import os
 import re
+import shutil
+import stat
 import sys
 import zipfile
+from pathlib import Path, PurePosixPath
 
 from mcp.server.fastmcp import FastMCP
 
@@ -77,6 +80,84 @@ def _extract_artifact_b64(stdout: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
+def _validate_workspace_py_file(file_path: str) -> tuple[Path | None, str | None]:
+    """Validate file path for colab_execute_file security policy."""
+    expanded = Path(file_path).expanduser()
+    try:
+        resolved = expanded.resolve(strict=True)
+    except FileNotFoundError:
+        return None, f"File not found: {expanded}"
+    except OSError as exc:
+        return None, f"Invalid file path: {exc}"
+
+    if not resolved.is_file():
+        return None, f"Not a regular file: {resolved}"
+
+    if resolved.suffix.lower() != ".py":
+        return None, "file_path must point to a .py file"
+
+    workspace_root = Path.cwd().resolve()
+    try:
+        resolved.relative_to(workspace_root)
+    except ValueError:
+        return None, f"file_path must be within workspace root: {workspace_root}"
+
+    return resolved, None
+
+
+def _is_unsafe_zip_entry(entry: zipfile.ZipInfo) -> bool:
+    """Return True when entry is symlink or special file type."""
+    mode = (entry.external_attr >> 16) & 0xFFFF
+    if mode == 0:
+        return False
+    file_type = stat.S_IFMT(mode)
+    if file_type == 0:
+        # Some ZIP creators omit unix file type bits; treat as regular.
+        return False
+    return file_type not in (stat.S_IFREG, stat.S_IFDIR)
+
+
+def _safe_extract_zip(zip_path: str, output_dir: str) -> list[str]:
+    """Safely extract zip while preventing zip-slip and special-file entries."""
+    output_root = Path(output_dir).resolve()
+    planned_entries: list[tuple[zipfile.ZipInfo, Path]] = []
+    extracted_files: list[str] = []
+
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        for entry in zf.infolist():
+            if not entry.filename:
+                raise ValueError("Unsafe zip member: empty filename")
+            if "\x00" in entry.filename:
+                raise ValueError(f"Unsafe zip member: {entry.filename}")
+
+            entry_path = PurePosixPath(entry.filename)
+            if entry_path.is_absolute():
+                raise ValueError(f"Unsafe zip member path: {entry.filename}")
+            if ".." in entry_path.parts:
+                raise ValueError(f"Unsafe zip member path: {entry.filename}")
+            if _is_unsafe_zip_entry(entry):
+                raise ValueError(f"Unsafe zip member type: {entry.filename}")
+
+            destination = (output_root / Path(*entry_path.parts)).resolve()
+            try:
+                destination.relative_to(output_root)
+            except ValueError as exc:
+                raise ValueError(f"Unsafe zip member path: {entry.filename}") from exc
+
+            planned_entries.append((entry, destination))
+
+        for entry, destination in planned_entries:
+            if entry.is_dir():
+                destination.mkdir(parents=True, exist_ok=True)
+                continue
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(entry, "r") as src, destination.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted_files.append(entry.filename)
+
+    return extracted_files
+
+
 # ── Runtime lifecycle helper ─────────────────────────────────────────────────
 
 def _run_on_colab(code: str, accelerator: str, timeout: int) -> tuple[str, str, int]:
@@ -138,10 +219,11 @@ def colab_execute_file(file_path: str, accelerator: str = "T4", timeout: int = 3
         accelerator: GPU type — "T4" (free-tier) or "L4" (premium). Default: "T4".
         timeout: Max execution time in seconds. Default: 300.
     """
-    file_path = os.path.expanduser(file_path)
-    if not os.path.isfile(file_path):
-        return json.dumps({"error": f"File not found: {file_path}"})
-    with open(file_path) as f:
+    resolved_file_path, error = _validate_workspace_py_file(file_path)
+    if error:
+        return json.dumps({"error": error})
+
+    with resolved_file_path.open() as f:
         code = f.read()
 
     wrapped, num_cells = _wrap_cells(code)
@@ -229,9 +311,7 @@ else:
             artifacts_zip_path = os.path.join(output_dir, "colab_artifacts.zip")
             with open(artifacts_zip_path, "wb") as f:
                 f.write(zip_bytes)
-            with zipfile.ZipFile(artifacts_zip_path, "r") as zf:
-                artifact_files = zf.namelist()
-                zf.extractall(output_dir)
+            artifact_files = _safe_extract_zip(artifacts_zip_path, output_dir)
         except Exception as e:
             errors.append({"artifact_error": str(e)})
 

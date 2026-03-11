@@ -27,5 +27,13 @@ dependencies = [
 [project.scripts]
 mcp-server-colab-exec = "mcp_server_colab_exec.server:main"
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_server_colab_exec"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

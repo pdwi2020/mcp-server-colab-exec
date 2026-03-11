@@ -88,6 +88,8 @@ Execute a local `.py` file on a Colab GPU runtime.
 | `accelerator` | string | `"T4"` | GPU type: `"T4"` (free) or `"L4"` (premium) |
 | `timeout`     | int    | `300`   | Max execution time in seconds            |
 
+Security policy: `file_path` must be a `.py` file inside the current workspace (`cwd`).
+
 ### `colab_execute_notebook`
 
 Execute code and collect all generated artifacts (images, CSVs, models, etc.).
@@ -100,6 +102,7 @@ Execute code and collect all generated artifacts (images, CSVs, models, etc.).
 | `timeout`     | int    | `300`   | Max execution time in seconds            |
 
 Artifacts are downloaded as a zip and extracted into `output_dir`.
+Zip members are validated before extraction to prevent path traversal and special-file writes.
 
 ## Examples
 
